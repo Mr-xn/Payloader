@@ -9,7 +9,8 @@
 [![Bilingual](https://img.shields.io/badge/i18n-中文%20%7C%20English-orange)](https://github.com/3516634930/Payloader)
 
 </div>
-
+---
+**征集更新需求： 本项目已经开始准备下一次更新了 有更新建议的师傅可以发邮件到3516634930@qq.com或者关注AJE安全公众号留言**
 ---
 
 ## 📸 功能预览
@@ -615,6 +616,7 @@ Payloader/
 **⭐ 如果这个项目对你有帮助，请给一个 Star！**
 
 **⭐ Star this repo if you find it useful!**
+
 
 [GitHub](https://github.com/3516634930/Payloader)
 
