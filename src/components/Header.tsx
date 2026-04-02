@@ -267,6 +267,7 @@ function Header({ sidebarCollapsed, setSidebarCollapsed }: HeaderProps) {
             font-size: 11px;
             color: var(--text-muted);
             letter-spacing: 1px;
+            margin-left: 4px;
             padding-left: 8px;
             border-left: 1px solid var(--border-color);
           }
