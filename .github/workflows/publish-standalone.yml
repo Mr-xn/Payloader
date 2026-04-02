@@ -1,0 +1,118 @@
+name: Publish standalone Payloader
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: 'Manual trigger release tag'
+        required: false
+        default: 'standalone-latest'
+      release_name:
+        description: 'Manual trigger release name'
+        required: false
+        default: 'Standalone Latest'
+      prerelease:
+        description: 'Create/update the manual trigger release as prerelease'
+        required: false
+        default: true
+        type: boolean
+  release:
+    types:
+      - published
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    env:
+      ASSET_NAME: Payloader.html
+      PAGES_REPO: Mr-xn/mr-xn.github.io
+      PAGES_FILE_PATH: Payloader.html
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm install --package-lock=false --registry=https://registry.npmjs.org
+
+      - name: Build standalone HTML
+        run: npm run build:standalone
+
+      - name: Resolve release target
+        id: release_target
+        shell: bash
+        run: |
+          if [[ "${{ github.event_name }}" == "release" ]]; then
+            echo "tag=${{ github.event.release.tag_name }}" >> "$GITHUB_OUTPUT"
+            echo "name=${{ github.event.release.name || github.event.release.tag_name }}" >> "$GITHUB_OUTPUT"
+            echo "prerelease=${{ github.event.release.prerelease }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "tag=${{ inputs.release_tag }}" >> "$GITHUB_OUTPUT"
+            echo "name=${{ inputs.release_name }}" >> "$GITHUB_OUTPUT"
+            echo "prerelease=${{ inputs.prerelease }}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Create or update release asset
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ steps.release_target.outputs.tag }}
+          RELEASE_NAME: ${{ steps.release_target.outputs.name }}
+          RELEASE_IS_PRERELEASE: ${{ steps.release_target.outputs.prerelease }}
+        shell: bash
+        run: |
+          if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
+            gh release upload "$RELEASE_TAG" "$ASSET_NAME" --clobber
+            exit 0
+          fi
+
+          release_args=(
+            release create
+            "$RELEASE_TAG"
+            "$ASSET_NAME"
+            --title "$RELEASE_NAME"
+            --notes "Automated standalone Payloader HTML build."
+          )
+
+          if [[ "$RELEASE_IS_PRERELEASE" == "true" ]]; then
+            release_args+=(--prerelease)
+          fi
+
+          gh "${release_args[@]}"
+
+      - name: Publish standalone HTML to Pages repository
+        env:
+          PAGES_TOKEN: ${{ secrets.MR_XN_GITHUB_IO_TOKEN }}
+          SOURCE_FILE: ${{ github.workspace }}/Payloader.html
+        shell: bash
+        run: |
+          if [[ -z "$PAGES_TOKEN" ]]; then
+            echo "::error::Missing secret MR_XN_GITHUB_IO_TOKEN."
+            exit 1
+          fi
+
+          workdir="$(mktemp -d)"
+          trap 'rm -rf "$workdir"' EXIT
+
+          git clone "https://x-access-token:${PAGES_TOKEN}@github.com/${PAGES_REPO}.git" "$workdir/pages"
+          cp "$SOURCE_FILE" "$workdir/pages/$PAGES_FILE_PATH"
+
+          cd "$workdir/pages"
+
+          if [[ -z "$(git status --short -- "$PAGES_FILE_PATH")" ]]; then
+            echo "No Pages update required."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "$PAGES_FILE_PATH"
+          git commit -m "chore: update standalone Payloader HTML"
+          git push

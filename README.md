@@ -132,6 +132,37 @@ npm run build:standalone
 
 这会生成 `Payloader.html` — 一个自包含的单 HTML 文件，将所有 CSS 和 JavaScript 内联，可以直接双击在浏览器中打开，无需任何服务器。
 
+### 自动发布单文件版本
+
+仓库已提供 GitHub Actions 工作流 `.github/workflows/publish-standalone.yml`，支持两种触发方式：
+
+- **手动触发**：在 Actions 页面运行 `Publish standalone Payloader`
+- **Release 触发**：当仓库发布 Release 时自动构建并上传
+
+工作流会自动执行以下操作：
+
+1. 运行 `npm run build:standalone` 构建最新的 `Payloader.html`
+2. 将 `Payloader.html` 上传到当前仓库对应的 **Release Assets**
+3. 将 `Payloader.html` 同步到 `Mr-xn/mr-xn.github.io` 仓库，用于 Pages 访问
+
+> Pages 同步后的访问地址为：`https://mr-xn.github.io/Payloader.html`
+
+#### 需要配置的 Secret
+
+在当前仓库的 **Settings → Secrets and variables → Actions** 中新增：
+
+- `MR_XN_GITHUB_IO_TOKEN`
+  - 需要对 `Mr-xn/mr-xn.github.io` 仓库具备写权限
+  - 用于把构建出的 `Payloader.html` 推送到 Pages 仓库
+
+#### 手动触发说明
+
+手动触发工作流时，可在 Actions 页面填写：
+
+- `release_tag`：要创建/更新的 Release 标签，默认 `standalone-latest`
+- `release_name`：要创建/更新的 Release 标题，默认 `Standalone Latest`
+- `prerelease`：是否将手动触发创建的 Release 标记为预发布版本
+
 ## 服务器部署
 
 Payloader 构建后是纯静态站点，不需要后端服务，任何能托管静态文件的方式都可以。
