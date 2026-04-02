@@ -12,6 +12,8 @@ function Header({ sidebarCollapsed, setSidebarCollapsed }: HeaderProps) {
   const { globalVariables, setGlobalVariables, bypassMode, setBypassMode, activeTab, setActiveTab, theme, setTheme, searchQuery, setSearchQuery, language, setLanguage } = useAppContext();
   const [showVariables, setShowVariables] = useState(false);
   const [showEncoding, setShowEncoding] = useState(false);
+  const currentRepoUrl = 'https://github.com/Mr-xn/Payloader';
+  const originalRepoUrl = 'https://github.com/3516634930/Payloader';
 
   const updateVariable = (key: string, value: string) => {
     setGlobalVariables(prev => 
@@ -39,17 +41,33 @@ function Header({ sidebarCollapsed, setSidebarCollapsed }: HeaderProps) {
           </button>
           <div className="logo">
             <span className="logo-icon">⚡</span>
-            <span className="logo-text">{t('header.logo', language)}</span>
-            <span className="logo-subtitle">{t('header.subtitle', language)}</span>
-            <a
-              href="https://github.com/3516634930/Payloader"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="github-link"
-              title="GitHub"
-            >
-              <svg viewBox="0 0 16 16" width="18" height="18" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
-            </a>
+            <div className="logo-content">
+              <div className="logo-primary">
+                <span className="logo-text">{t('header.logo', language)}</span>
+                <span className="logo-subtitle">{t('header.subtitle', language)}</span>
+              </div>
+              <div className="logo-meta">
+                <span className="build-badge">{t('header.browserEdition', language)}</span>
+                <a
+                  href={currentRepoUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="repo-link repo-link-current"
+                  title={`${t('header.currentRepo', language)} · Mr-xn/Payloader`}
+                >
+                  Mr-xn/Payloader
+                </a>
+                <a
+                  href={originalRepoUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="repo-link repo-link-original"
+                  title={`${t('header.originalRepo', language)} · 3516634930/Payloader`}
+                >
+                  {t('header.originalRepo', language)}
+                </a>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -216,6 +234,19 @@ function Header({ sidebarCollapsed, setSidebarCollapsed }: HeaderProps) {
             gap: 10px;
           }
 
+          .logo-content {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 4px;
+          }
+
+          .logo-primary {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+          }
+
           .logo-icon {
             font-size: 28px;
             filter: drop-shadow(0 0 10px var(--neon-cyan));
@@ -236,22 +267,59 @@ function Header({ sidebarCollapsed, setSidebarCollapsed }: HeaderProps) {
             font-size: 11px;
             color: var(--text-muted);
             letter-spacing: 1px;
-            margin-left: 8px;
+            margin-left: 4px;
             padding-left: 8px;
             border-left: 1px solid var(--border-color);
           }
 
-          .github-link {
+          .logo-meta {
             display: flex;
             align-items: center;
-            justify-content: center;
-            margin-left: 10px;
-            color: var(--text-muted);
-            transition: color var(--transition-fast);
+            flex-wrap: wrap;
+            gap: 8px;
           }
 
-          .github-link:hover {
+          .build-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 2px 8px;
+            border-radius: 999px;
+            border: 1px solid rgba(0, 240, 255, 0.35);
+            background: rgba(0, 240, 255, 0.08);
             color: var(--neon-cyan);
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+          }
+
+          .repo-link {
+            display: inline-flex;
+            align-items: center;
+            padding: 2px 8px;
+            border-radius: 999px;
+            border: 1px solid var(--border-color);
+            background: rgba(255, 255, 255, 0.03);
+            color: var(--text-muted);
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 0.6px;
+            text-decoration: none;
+            transition: all var(--transition-fast);
+          }
+
+          .repo-link:hover {
+            border-color: var(--neon-cyan);
+            color: var(--neon-cyan);
+            transform: translateY(-1px);
+          }
+
+          .repo-link-current {
+            color: var(--text-secondary);
+          }
+
+          .repo-link-original {
+            border-color: rgba(255, 0, 85, 0.2);
           }
 
           .header-center {
