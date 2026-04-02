@@ -4,6 +4,9 @@ const translations = {
   // === Header ===
   'header.logo': { zh: 'PAYLOADER', en: 'PAYLOADER' },
   'header.subtitle': { zh: '渗透测试辅助平台', en: 'Pentest Assistance Platform' },
+  'header.browserEdition': { zh: 'Modified for Browser 环境', en: 'Modified for Browser Environment' },
+  'header.currentRepo': { zh: '当前仓库', en: 'Current Repo' },
+  'header.originalRepo': { zh: '原始仓库', en: 'Original Source' },
   'header.searchPlaceholder': { zh: '搜索 Payload / 工具 / 标签...', en: 'Search Payload / Tool / Tag...' },
   'header.tabPayloads': { zh: '💀 渗透Payload', en: '💀 Payloads' },
   'header.tabTools': { zh: '🛠️ 工具命令', en: '🛠️ Tools' },
