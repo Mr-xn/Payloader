@@ -33,7 +33,8 @@ function buildStandalone() {
 
   // Inline CSS: replace <link rel="stylesheet" ...> with <style>...</style>
   for (const cssFile of cssFiles) {
-    const cssContent = readFileSync(join(distDir, 'assets', cssFile), 'utf-8');
+    const cssContent = readFileSync(join(distDir, 'assets', cssFile), 'utf-8')
+      .replace(/@import\s+(?:url\()?(["'])https?:\/\/[^"')]+\1\)?;\s*/g, '');
     const linkRegex = new RegExp(`<link[^>]*href=["']\\./assets/${cssFile.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}["'][^>]*>`, 'g');
     // Use function replacement to avoid $& expansion in replacement string
     html = html.replace(linkRegex, () => `<style>${cssContent}</style>`);
