@@ -19,9 +19,15 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const rootDir = join(__dirname, '..');
 const distDir = join(rootDir, 'dist');
+// Strip external CSS imports such as:
+// - @import url("https://...")
+// - @import url(https://...)
+// - @import "https://..."
+// Optional trailing media queries are also removed so the standalone file stays self-contained.
 const externalCssImportRegex = /@import\s+(?:url\(\s*)?(?:(["'])https?:\/\/[^"')]+\1|https?:\/\/[^"')\s]+)\s*\)?(?:\s+[^;]+)?;\s*/g;
 
 function wrapStandaloneScript(jsContent) {
+  // jsContent comes from the locally built Vite bundle under dist/assets and is treated as trusted build output.
   return [
     '<script>',
     '(function(){',
