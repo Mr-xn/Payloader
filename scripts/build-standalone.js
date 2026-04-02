@@ -19,6 +19,22 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const rootDir = join(__dirname, '..');
 const distDir = join(rootDir, 'dist');
+const externalCssImportRegex = /@import\s+(?:url\(\s*)?(?:(["'])https?:\/\/[^"')]+\1|https?:\/\/[^"')\s]+)\s*\)?(?:\s+[^;]+)?;\s*/g;
+
+function wrapStandaloneScript(jsContent) {
+  return [
+    '<script>',
+    '(function(){',
+    `  const run = () => {${jsContent}};`,
+    '  if (document.readyState === "loading") {',
+    '    document.addEventListener("DOMContentLoaded", run, { once: true });',
+    '  } else {',
+    '    run();',
+    '  }',
+    '})();',
+    '</script>',
+  ].join('');
+}
 
 function buildStandalone() {
   // Read the built index.html
@@ -34,7 +50,7 @@ function buildStandalone() {
   // Inline CSS: replace <link rel="stylesheet" ...> with <style>...</style>
   for (const cssFile of cssFiles) {
     const cssContent = readFileSync(join(distDir, 'assets', cssFile), 'utf-8')
-      .replace(/@import\s+(?:url\()?(["'])https?:\/\/[^"')]+\1\)?;\s*/g, '');
+      .replace(externalCssImportRegex, '');
     const linkRegex = new RegExp(`<link[^>]*href=["']\\./assets/${cssFile.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}["'][^>]*>`, 'g');
     // Use function replacement to avoid $& expansion in replacement string
     html = html.replace(linkRegex, () => `<style>${cssContent}</style>`);
@@ -47,10 +63,7 @@ function buildStandalone() {
     // Use a classic script for file:// compatibility, but defer execution until the DOM is ready.
     // The Vite bundle is fully self-contained with no ES module imports.
     // Use function replacement to avoid $& expansion in replacement string
-    html = html.replace(
-      scriptRegex,
-      () => `<script>(function(){const run=()=>{${jsContent}};if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",run,{once:true});}else{run();}})();</script>`
-    );
+    html = html.replace(scriptRegex, () => wrapStandaloneScript(jsContent));
   }
 
   // Write the standalone HTML file
