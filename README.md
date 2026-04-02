@@ -84,12 +84,23 @@
 
 ## 本地使用
 
-### 环境要求
+### 🚀 方式一：直接打开（无需安装任何东西）
+
+项目提供了预构建的单文件版本 **`Payloader.html`**，包含所有功能，无需 Node.js、无需编译、无需服务器：
+
+1. 下载仓库中的 [`Payloader.html`](Payloader.html) 文件
+2. 双击用浏览器打开即可使用
+
+> 💡 这是一个约 2MB 的自包含 HTML 文件，所有 CSS 和 JavaScript 都已内联，支持离线使用（字体除外）。
+
+### 方式二：开发模式（需要 Node.js）
+
+#### 环境要求
 
 - **Node.js** >= 18.0
 - **npm** >= 8.0（或 pnpm / yarn）
 
-### 安装与启动
+#### 安装与启动
 
 ```bash
 # 1. 克隆项目
@@ -112,6 +123,14 @@ npm run build
 ```
 
 构建产物在 `dist/` 目录下，是纯静态文件（HTML + CSS + JS），可以直接用浏览器打开 `dist/index.html` 使用。
+
+### 构建单文件独立版本
+
+```bash
+npm run build:standalone
+```
+
+这会生成 `Payloader.html` — 一个自包含的单 HTML 文件，将所有 CSS 和 JavaScript 内联，可以直接双击在浏览器中打开，无需任何服务器。
 
 ## 服务器部署
 
@@ -374,12 +393,23 @@ It features **300+ curated payloads** across Web application security and intran
 
 ## Local Usage
 
-### Requirements
+### 🚀 Option 1: Just Open It (No Installation Required)
+
+The project provides a pre-built single-file version **`Payloader.html`** with all features included — no Node.js, no build step, no server needed:
+
+1. Download [`Payloader.html`](Payloader.html) from the repository
+2. Double-click to open in your browser
+
+> 💡 This is a ~2MB self-contained HTML file with all CSS and JavaScript inlined. Works offline (except for fonts).
+
+### Option 2: Development Mode (Requires Node.js)
+
+#### Requirements
 
 - **Node.js** >= 18.0
 - **npm** >= 8.0 (or pnpm / yarn)
 
-### Install & Run
+#### Install & Run
 
 ```bash
 # 1. Clone the repository
@@ -402,6 +432,14 @@ npm run build
 ```
 
 Output goes to `dist/` — pure static files (HTML + CSS + JS). You can open `dist/index.html` directly in a browser.
+
+### Build Standalone Single-File Version
+
+```bash
+npm run build:standalone
+```
+
+This generates `Payloader.html` — a self-contained single HTML file with all CSS and JavaScript inlined. Just double-click to open in any browser, no server needed.
 
 ## Server Deployment
 
