@@ -84,12 +84,23 @@
 
 ## 本地使用
 
-### 环境要求
+### 🚀 方式一：直接打开（无需安装任何东西）
+
+项目提供了预构建的单文件版本 **`Payloader.html`**，包含所有功能，无需 Node.js、无需编译、无需服务器：
+
+1. 下载仓库中的 [`Payloader.html`](Payloader.html) 文件
+2. 双击用浏览器打开即可使用
+
+> 💡 这是一个约 2MB 的自包含 HTML 文件，所有 CSS 和 JavaScript 都已内联，支持离线使用（字体除外）。
+
+### 方式二：开发模式（需要 Node.js）
+
+#### 环境要求
 
 - **Node.js** >= 18.0
 - **npm** >= 8.0（或 pnpm / yarn）
 
-### 安装与启动
+#### 安装与启动
 
 ```bash
 # 1. 克隆项目
@@ -112,6 +123,45 @@ npm run build
 ```
 
 构建产物在 `dist/` 目录下，是纯静态文件（HTML + CSS + JS），可以直接用浏览器打开 `dist/index.html` 使用。
+
+### 构建单文件独立版本
+
+```bash
+npm run build:standalone
+```
+
+这会生成 `Payloader.html` — 一个自包含的单 HTML 文件，将所有 CSS 和 JavaScript 内联，可以直接双击在浏览器中打开，无需任何服务器。
+
+### 自动发布单文件版本
+
+仓库已提供 GitHub Actions 工作流 `.github/workflows/publish-standalone.yml`，支持两种触发方式：
+
+- **手动触发**：在 Actions 页面运行 `Publish standalone Payloader`
+- **Release 触发**：当仓库发布 Release 时自动构建并上传
+
+工作流会自动执行以下操作：
+
+1. 运行 `npm run build:standalone` 构建最新的 `Payloader.html`
+2. 将 `Payloader.html` 上传到当前仓库对应的 **Release Assets**
+3. 将 `Payloader.html` 同步到 `Mr-xn/mr-xn.github.io` 仓库，用于 Pages 访问
+
+> Pages 同步后的访问地址为：`https://mr-xn.github.io/Payloader.html`
+
+#### 需要配置的 Secret
+
+在当前仓库的 **Settings → Secrets and variables → Actions** 中新增：
+
+- `MR_XN_GITHUB_IO_TOKEN`
+  - 需要对 `Mr-xn/mr-xn.github.io` 仓库具备写权限
+  - 用于把构建出的 `Payloader.html` 推送到 Pages 仓库
+
+#### 手动触发说明
+
+手动触发工作流时，可在 Actions 页面填写：
+
+- `release_tag`：要创建/更新的 Release 标签，默认 `standalone-latest`
+- `release_name`：要创建/更新的 Release 标题，默认 `Standalone Latest`
+- `prerelease`：是否将手动触发创建的 Release 标记为预发布版本
 
 ## 服务器部署
 
@@ -374,12 +424,23 @@ It features **300+ curated payloads** across Web application security and intran
 
 ## Local Usage
 
-### Requirements
+### 🚀 Option 1: Just Open It (No Installation Required)
+
+The project provides a pre-built single-file version **`Payloader.html`** with all features included — no Node.js, no build step, no server needed:
+
+1. Download [`Payloader.html`](Payloader.html) from the repository
+2. Double-click to open in your browser
+
+> 💡 This is a ~2MB self-contained HTML file with all CSS and JavaScript inlined. Works offline (except for fonts).
+
+### Option 2: Development Mode (Requires Node.js)
+
+#### Requirements
 
 - **Node.js** >= 18.0
 - **npm** >= 8.0 (or pnpm / yarn)
 
-### Install & Run
+#### Install & Run
 
 ```bash
 # 1. Clone the repository
@@ -402,6 +463,14 @@ npm run build
 ```
 
 Output goes to `dist/` — pure static files (HTML + CSS + JS). You can open `dist/index.html` directly in a browser.
+
+### Build Standalone Single-File Version
+
+```bash
+npm run build:standalone
+```
+
+This generates `Payloader.html` — a self-contained single HTML file with all CSS and JavaScript inlined. Just double-click to open in any browser, no server needed.
 
 ## Server Deployment
 
