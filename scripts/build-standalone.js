@@ -19,6 +19,28 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const rootDir = join(__dirname, '..');
 const distDir = join(rootDir, 'dist');
+// Strip external CSS imports such as:
+// - @import url("https://...")
+// - @import url(https://...)
+// - @import "https://..."
+// Optional trailing media queries are also removed so the standalone file stays self-contained.
+const externalCssImportRegex = /@import\s+(?:url\(\s*)?(?:(["'])https?:\/\/[^"')]+\1|https?:\/\/[^"')\s]+)\s*\)?(?:\s+[^;]+)?;\s*/g;
+
+function wrapStandaloneScript(jsContent) {
+  // jsContent comes from the locally built Vite bundle under dist/assets and is treated as trusted build output.
+  return [
+    '<script>',
+    '(function(){',
+    `  const run = () => {${jsContent}};`,
+    '  if (document.readyState === "loading") {',
+    '    document.addEventListener("DOMContentLoaded", run, { once: true });',
+    '  } else {',
+    '    run();',
+    '  }',
+    '})();',
+    '</script>',
+  ].join('');
+}
 
 function buildStandalone() {
   // Read the built index.html
@@ -33,20 +55,21 @@ function buildStandalone() {
 
   // Inline CSS: replace <link rel="stylesheet" ...> with <style>...</style>
   for (const cssFile of cssFiles) {
-    const cssContent = readFileSync(join(distDir, 'assets', cssFile), 'utf-8');
+    const cssContent = readFileSync(join(distDir, 'assets', cssFile), 'utf-8')
+      .replace(externalCssImportRegex, '');
     const linkRegex = new RegExp(`<link[^>]*href=["']\\./assets/${cssFile.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}["'][^>]*>`, 'g');
     // Use function replacement to avoid $& expansion in replacement string
     html = html.replace(linkRegex, () => `<style>${cssContent}</style>`);
   }
 
-  // Inline JS: replace <script src="..."> with <script>...</script>
+  // Inline JS while preserving module-script timing so the app mounts after #root exists.
   for (const jsFile of jsFiles) {
     const jsContent = readFileSync(join(distDir, 'assets', jsFile), 'utf-8');
     const scriptRegex = new RegExp(`<script[^>]*src=["']\\./assets/${jsFile.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}["'][^>]*><\\/script>`, 'g');
-    // Use regular script (not type="module") for file:// protocol compatibility.
+    // Use a classic script for file:// compatibility, but defer execution until the DOM is ready.
     // The Vite bundle is fully self-contained with no ES module imports.
     // Use function replacement to avoid $& expansion in replacement string
-    html = html.replace(scriptRegex, () => `<script>${jsContent}</script>`);
+    html = html.replace(scriptRegex, () => wrapStandaloneScript(jsContent));
   }
 
   // Write the standalone HTML file
